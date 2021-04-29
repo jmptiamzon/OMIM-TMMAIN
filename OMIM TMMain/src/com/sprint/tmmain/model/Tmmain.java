@@ -3,7 +3,7 @@ package com.sprint.tmmain.model;
 public class Tmmain {
 	private String sku;
 	private double qty;
-	private int tmmainQty;
+	private double tmmainQty;
 	private double delta;
 	
 	public Tmmain() {
@@ -33,7 +33,7 @@ public class Tmmain {
 		return tmmainQty;
 	}
 
-	public void setTmmainQty(int tmmainQty) {
+	public void setTmmainQty(double tmmainQty) {
 		this.tmmainQty = tmmainQty;
 	}
 

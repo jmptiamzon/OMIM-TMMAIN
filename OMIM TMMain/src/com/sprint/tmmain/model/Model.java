@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class Model {
 	
-	public Map<String, Integer> runTmmain(String parameters) {
-		Map<String, Integer> record = new HashMap<>();
+	public Map<String, Double> runTmmain(String parameters) {
+		Map<String, Double> record = new HashMap<>();
 		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -33,7 +33,7 @@ public class Model {
 			ResultSet rs = statement.executeQuery();
 			
 			while (rs.next()) {
-				record.put(rs.getString(1), rs.getInt(4));
+				record.put(rs.getString(1), rs.getDouble(4));
 			}
 			
 		} catch (ClassNotFoundException e) {
