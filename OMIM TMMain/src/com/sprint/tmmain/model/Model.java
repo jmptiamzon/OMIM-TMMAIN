@@ -16,7 +16,7 @@ public class Model {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection conn = 
-					DriverManager.getConnection("jdbc:oracle:thin:@POC0365.corp.sprint.com:1521/OIMP101", "apps_query", "apps_query");
+					DriverManager.getConnection("", "", "");
 			
 			PreparedStatement statement = conn.prepareStatement(
 					"SELECT msi.segment1, msi.organization_id,moq.subinventory_code, SUM (moq.transaction_quantity) total " + 
