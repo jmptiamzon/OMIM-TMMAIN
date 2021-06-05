@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Model {
 	
-	public Map<String, Double> runTmmain(String parameters) {
+	public Map<String, Double> runQuery(String parameters, String orgId, String subinvCode) {
 		Map<String, Double> record = new HashMap<>();
 		
 		try {
@@ -23,8 +23,8 @@ public class Model {
 					"FROM apps.mtl_system_items_b msi, apps.mtl_onhand_quantities moq " + 
 					"WHERE moq.organization_id = msi.organization_id " + 
 					"AND moq.inventory_item_id = msi.inventory_item_id " + 
-					"and moq.ORGANIZATION_ID = 204 " + 
-					"and moq.subinventory_code='TMMAIN' " + 
+					"and moq.ORGANIZATION_ID = " + orgId + " " + 
+					"and moq.subinventory_code=" + subinvCode + " " +
 					"and msi.SEGMENT1 in (" + 
 					parameters + ") " +
 					"group by msi.segment1, msi.organization_id,moq.subinventory_code"

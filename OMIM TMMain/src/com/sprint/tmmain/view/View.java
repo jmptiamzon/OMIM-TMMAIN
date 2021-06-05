@@ -11,6 +11,7 @@ import java.io.File;
 import java.nio.file.Paths;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -21,7 +22,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.sprint.tmmain.controller.Controller;
 
-public class View extends JFrame implements ActionListener {
+ public class View extends JFrame implements ActionListener {
 	/**
 	 * 
 	 */
@@ -30,12 +31,16 @@ public class View extends JFrame implements ActionListener {
 	private File file;
 	private JTextField filenameField;
 	private JButton btnChoose, btnGenerate;
-	private JPanel paneLeft, paneRight, paneBottom;
+	private JPanel paneTop, paneLeft, paneRight, paneBottom;
 	private GridBagConstraints gbc;
 	private Insets inset;
 	private JFileChooser filechooser;
 	private Controller controller;
+	@SuppressWarnings("unused")
+	private JComboBox<?> dropdownSelector;
+	private static final String []DROPDOWN_ITEMS = new String[] {"TMMAIN", "RW2"};
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public View() {
 		try {
 			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -48,6 +53,7 @@ public class View extends JFrame implements ActionListener {
 			System.out.println(e.getMessage());
 		}
 		
+		dropdownSelector = new JComboBox(DROPDOWN_ITEMS);
 		controller = new Controller();
 		filechooser = new JFileChooser();
 		gbc = new GridBagConstraints();
@@ -62,6 +68,7 @@ public class View extends JFrame implements ActionListener {
 		btnGenerate.addActionListener(this);
 		
 		setLayout(new BorderLayout());
+		paneTop = new JPanel(new GridBagLayout());
 		paneLeft = new JPanel(new GridBagLayout());
 		paneRight = new JPanel(new GridBagLayout());
 		paneBottom = new JPanel(new GridBagLayout());
@@ -69,10 +76,12 @@ public class View extends JFrame implements ActionListener {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("OMIM TMMAIN");
+		add(paneTop, BorderLayout.NORTH);
 		add(paneLeft, BorderLayout.WEST);
 		add(paneRight, BorderLayout.CENTER);
 		add(paneBottom, BorderLayout.SOUTH);
 		
+		setComponent(dropdownSelector, paneTop, 1, 1, 0, 0, 0);
 		setComponent(filenameField, paneLeft, 1, 1, 0, 0, 200);
 		setComponent(btnChoose, paneRight, 1, 1, 0, 0, 0);
 		setComponent(btnGenerate, paneBottom, 1, 1, 0, 0, 0);
@@ -110,7 +119,7 @@ public class View extends JFrame implements ActionListener {
 			}
 
 		} else if (event.getSource() == btnGenerate) {
-			controller.runApp(filepath);
+			controller.runApp(filepath, dropdownSelector.getSelectedItem().toString());
 		}
 		
 	}

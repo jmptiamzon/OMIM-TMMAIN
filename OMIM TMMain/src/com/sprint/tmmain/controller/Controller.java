@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,23 +21,27 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.sprint.tmmain.model.Model;
+import com.sprint.tmmain.model.RW2;
 import com.sprint.tmmain.model.Tmmain;
 
 public class Controller  {
 	private Model model;
 	private List<Tmmain> tmmainContent;
+	private List<RW2> rw2Content;
 	private Tmmain tmmain;
+	private RW2 rw2;
 	private String parameters;
 	private Map<String, Double> sqlRecord;
-	private double totalTmmainQty, totalQty, totalDelta;
+	private double totalQueryQty, totalQty, totalDelta;
 	
-	public void runApp(String filename) {
-		totalTmmainQty = 0;
+	public void runApp(String filename, String dropdownValue) {
+		totalQueryQty = 0;
 		totalQty = 0;
 		totalDelta = 0;
 		sqlRecord = new HashMap<>();
 		model = new Model();
 		tmmainContent = new ArrayList<>();
+		rw2Content = new ArrayList<>();
 		parameters = "";
 		
 		try {
@@ -47,23 +53,49 @@ public class Controller  {
 			
 			
 			Iterator<Row> iter = sheet.iterator();
+			
+			if (dropdownValue.equalsIgnoreCase("tmmain")) {
+				while (iter.hasNext()) {
+					Row nextRow = iter.next();
+					
+					if (!nextRow.getCell(0).getStringCellValue().trim().equalsIgnoreCase("sku") && !nextRow.getCell(0).getStringCellValue().trim().equalsIgnoreCase("grand total")) {
 
-			while (iter.hasNext()) {
-				Row nextRow = iter.next();
-				
-				if (!nextRow.getCell(0).getStringCellValue().trim().equalsIgnoreCase("sku") && !nextRow.getCell(0).getStringCellValue().trim().equalsIgnoreCase("grand total")) {
-					tmmain = new Tmmain();
-					tmmain.setSku(nextRow.getCell(0).getStringCellValue().trim());
-					parameters += "'" + nextRow.getCell(0).getStringCellValue().trim() + "',";
-					tmmain.setQty(nextRow.getCell(1).getNumericCellValue());
-					tmmainContent.add(tmmain);
+							tmmain = new Tmmain();
+							tmmain.setSku(nextRow.getCell(0).getStringCellValue().trim());
+							parameters += "'" + nextRow.getCell(0).getStringCellValue().trim() + "',";
+							tmmain.setQty(nextRow.getCell(1).getNumericCellValue());
+							tmmainContent.add(tmmain);
+
+					}
+					
+				}
+			}
+			
+			if (dropdownValue.equalsIgnoreCase("rw2")) {
+				while (iter.hasNext()) {
+					Row nextRow = iter.next();
+					
+					if (!nextRow.getCell(0).getStringCellValue().trim().equalsIgnoreCase("sku") && !nextRow.getCell(0).getStringCellValue().trim().isEmpty()) {
+
+							rw2 = new RW2();
+							rw2.setSku(nextRow.getCell(0).getStringCellValue().trim());
+							parameters += "'" + nextRow.getCell(0).getStringCellValue().trim() + "',";
+							rw2.setDescription(nextRow.getCell(1).getStringCellValue());
+							rw2.setQty(nextRow.getCell(2).getNumericCellValue());
+							rw2Content.add(rw2);
+
+					}
+					
 				}
 				
+				
 			}
+
+
 			
 			// get data
 			parameters = parameters.substring(0, parameters.length() - 1);
-			sqlRecord = model.runTmmain(parameters);
+			sqlRecord = dropdownValue.equalsIgnoreCase("tmmain") ? model.runQuery(parameters, "204", "TMMAIN") : model.runQuery(parameters, "204", "RW2"); //ditio
 			
 			for (int ctr = 0; ctr < tmmainContent.size(); ctr++) {
 				if (sqlRecord.containsKey(tmmainContent.get(ctr).getSku())) {
@@ -78,7 +110,7 @@ public class Controller  {
 			//write
 			Row row;
 			for (int ctr = 0; ctr < tmmainContent.size(); ctr++) {
-				totalTmmainQty += tmmainContent.get(ctr).getTmmainQty();
+				totalQueryQty += tmmainContent.get(ctr).getTmmainQty();
 				totalQty += tmmainContent.get(ctr).getQty();
 				
 				row = sheet.createRow(ctr + 1);
@@ -115,11 +147,11 @@ public class Controller  {
 			cell.setCellStyle(style);
 			
 			cell = row.createCell(2);
-			cell.setCellValue((int)totalTmmainQty);
+			cell.setCellValue((int)totalQueryQty);
 			cell.setCellStyle(style);
 			
 			cell = row.createCell(3);
-			totalDelta = totalTmmainQty - totalQty;
+			totalDelta = totalQueryQty - totalQty;
 			cell.setCellValue((int)totalDelta);
 			cell.setCellStyle(style);
 			
@@ -133,6 +165,8 @@ public class Controller  {
 		} catch (IOException e) {
 			System.out.println("File error: " + e.getMessage());
 		}
+		
+		JOptionPane.showMessageDialog(null, "TMMAIN generation done. You can open the file now.");
 		
 	}
 }
