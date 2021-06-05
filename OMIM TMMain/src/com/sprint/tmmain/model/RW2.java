@@ -11,9 +11,9 @@ public class RW2 {
 	public RW2() {
 		sku = "";
 		description = "";
-		qty = 0.0;
-		rw2Qty = 0.0;
-		delta = 0.0;
+		qty = 0;
+		rw2Qty = 0;
+		delta = 0;
 	}
 
 	public String getSku() {

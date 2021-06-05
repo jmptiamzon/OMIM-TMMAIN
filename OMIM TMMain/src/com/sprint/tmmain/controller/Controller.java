@@ -91,69 +91,143 @@ public class Controller  {
 				
 			}
 
-
-			
 			// get data
 			parameters = parameters.substring(0, parameters.length() - 1);
-			sqlRecord = dropdownValue.equalsIgnoreCase("tmmain") ? model.runQuery(parameters, "204", "TMMAIN") : model.runQuery(parameters, "204", "RW2"); //ditio
+			sqlRecord = dropdownValue.equalsIgnoreCase("tmmain") ? model.runQuery(parameters, "204", "TMMAIN") : model.runQuery(parameters, "204", "MAIN"); //ditio
 			
-			for (int ctr = 0; ctr < tmmainContent.size(); ctr++) {
-				if (sqlRecord.containsKey(tmmainContent.get(ctr).getSku())) {
-					tmmainContent.get(ctr).setTmmainQty(sqlRecord.get(tmmainContent.get(ctr).getSku()));
-					tmmainContent.get(ctr).setDelta(sqlRecord.get(tmmainContent.get(ctr).getSku()) - tmmainContent.get(ctr).getQty());
-				} else {
-					tmmainContent.get(ctr).setDelta(0.0 - tmmainContent.get(ctr).getQty());
+			if (dropdownValue.equalsIgnoreCase("tmmain")) {
+				for (int ctr = 0; ctr < tmmainContent.size(); ctr++) {
+					if (sqlRecord.containsKey(tmmainContent.get(ctr).getSku())) {
+						tmmainContent.get(ctr).setTmmainQty(sqlRecord.get(tmmainContent.get(ctr).getSku()));
+						tmmainContent.get(ctr).setDelta(sqlRecord.get(tmmainContent.get(ctr).getSku()) - tmmainContent.get(ctr).getQty());
+					} else {
+						tmmainContent.get(ctr).setDelta(0.0 - tmmainContent.get(ctr).getQty());
+					}
+					
 				}
 				
 			}
 			
+			if (dropdownValue.equalsIgnoreCase("rw2")) {
+				for (int ctr = 0; ctr < rw2Content.size(); ctr++) {
+					if (sqlRecord.containsKey(rw2Content.get(ctr).getSku())) {
+						rw2Content.get(ctr).setRw2Qty(sqlRecord.get(rw2Content.get(ctr).getSku()));
+						rw2Content.get(ctr).setDelta(sqlRecord.get(rw2Content.get(ctr).getSku()) - rw2Content.get(ctr).getQty());
+					} else {
+						rw2Content.get(ctr).setDelta(0.0 - rw2Content.get(ctr).getQty());
+					}
+					
+				}
+			}
+
+			
 			//write
 			Row row;
-			for (int ctr = 0; ctr < tmmainContent.size(); ctr++) {
-				totalQueryQty += tmmainContent.get(ctr).getTmmainQty();
-				totalQty += tmmainContent.get(ctr).getQty();
+			
+			if (dropdownValue.equalsIgnoreCase("tmmain")) {
+				for (int ctr = 0; ctr < tmmainContent.size(); ctr++) {
+					totalQueryQty += tmmainContent.get(ctr).getTmmainQty();
+					totalQty += tmmainContent.get(ctr).getQty();
+					
+					row = sheet.createRow(ctr + 1);
+					
+					style.setBorderTop(BorderStyle.THIN);
+					style.setBorderBottom(BorderStyle.THIN);
+					style.setBorderRight(BorderStyle.THIN);
+					style.setBorderLeft(BorderStyle.THIN);
+					
+					Cell cell = row.createCell(2);
+					cell.setCellValue((int)tmmainContent.get(ctr).getTmmainQty());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(0);
+					cell.setCellValue(tmmainContent.get(ctr).getSku());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(1);
+					cell.setCellValue(tmmainContent.get(ctr).getQty());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(3);
+					cell.setCellValue((int)tmmainContent.get(ctr).getDelta());
+					cell.setCellStyle(style);
+				}
 				
-				row = sheet.createRow(ctr + 1);
-				
-				style.setBorderTop(BorderStyle.THIN);
-				style.setBorderBottom(BorderStyle.THIN);
-				style.setBorderRight(BorderStyle.THIN);
-				style.setBorderLeft(BorderStyle.THIN);
-				
-				Cell cell = row.createCell(2);
-				cell.setCellValue((int)tmmainContent.get(ctr).getTmmainQty());
+				row = sheet.createRow(tmmainContent.size() + 1);
+				Cell cell = row.createCell(0);
+				cell.setCellValue("Grand Total");
 				cell.setCellStyle(style);
 				
-				cell = row.createCell(0);
-				cell.setCellValue(tmmainContent.get(ctr).getSku());
-				cell.setCellStyle(style);
 				
 				cell = row.createCell(1);
-				cell.setCellValue(tmmainContent.get(ctr).getQty());
+				cell.setCellValue((int)totalQty);
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(2);
+				cell.setCellValue((int)totalQueryQty);
 				cell.setCellStyle(style);
 				
 				cell = row.createCell(3);
-				cell.setCellValue((int)tmmainContent.get(ctr).getDelta());
+				totalDelta = totalQueryQty - totalQty;
+				cell.setCellValue((int)totalDelta);
 				cell.setCellStyle(style);
 			}
 			
-			row = sheet.createRow(tmmainContent.size() + 1);
-			Cell cell = row.createCell(0);
-			cell.setCellValue("Grand Total");
-			cell.setCellStyle(style);
-			
-			cell = row.createCell(1);
-			cell.setCellValue((int)totalQty);
-			cell.setCellStyle(style);
-			
-			cell = row.createCell(2);
-			cell.setCellValue((int)totalQueryQty);
-			cell.setCellStyle(style);
-			
-			cell = row.createCell(3);
-			totalDelta = totalQueryQty - totalQty;
-			cell.setCellValue((int)totalDelta);
-			cell.setCellStyle(style);
+			if (dropdownValue.equalsIgnoreCase("rw2")) {
+				for (int ctr = 0; ctr < rw2Content.size(); ctr++) {
+					totalQueryQty += rw2Content.get(ctr).getRw2Qty();
+					totalQty += rw2Content.get(ctr).getQty();
+					
+					row = sheet.createRow(ctr + 1);
+					
+					style.setBorderTop(BorderStyle.THIN);
+					style.setBorderBottom(BorderStyle.THIN);
+					style.setBorderRight(BorderStyle.THIN);
+					style.setBorderLeft(BorderStyle.THIN);
+					
+					Cell cell = row.createCell(3);
+					cell.setCellValue((int)rw2Content.get(ctr).getRw2Qty());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(0);
+					cell.setCellValue(rw2Content.get(ctr).getSku());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(1);
+					cell.setCellValue(rw2Content.get(ctr).getDescription());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(2);
+					cell.setCellValue(rw2Content.get(ctr).getQty());
+					cell.setCellStyle(style);
+					
+					cell = row.createCell(4);
+					cell.setCellValue((int)rw2Content.get(ctr).getDelta());
+					cell.setCellStyle(style);
+				}
+				
+				row = sheet.createRow(rw2Content.size() + 1);
+				Cell cell = row.createCell(0);
+				cell.setCellValue("");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(1);
+				cell.setCellValue("");
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(2);
+				cell.setCellValue((int)totalQty);
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(3);
+				cell.setCellValue((int)totalQueryQty);
+				cell.setCellStyle(style);
+				
+				cell = row.createCell(4);
+				totalDelta = totalQueryQty - totalQty;
+				cell.setCellValue((int)totalDelta);
+				cell.setCellStyle(style);
+			} 
 			
 			xlsxFile.close();
 			
@@ -166,7 +240,7 @@ public class Controller  {
 			System.out.println("File error: " + e.getMessage());
 		}
 		
-		JOptionPane.showMessageDialog(null, "TMMAIN generation done. You can open the file now.");
+		JOptionPane.showMessageDialog(null, dropdownValue + " generation done. You can open the file now.");
 		
 	}
 }
